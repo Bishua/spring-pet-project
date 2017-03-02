@@ -30,6 +30,4 @@ public class WebApplication implements WebApplicationInitializer {
         ctx.register(WebApplicationConfig.class);
         return ctx;
     }
-
-
 }
