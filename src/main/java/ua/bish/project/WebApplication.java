@@ -5,6 +5,7 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import ua.bish.project.config.ORMConfig;
 import ua.bish.project.config.WebApplicationConfig;
 
 import javax.servlet.ServletContext;
@@ -25,9 +26,9 @@ public class WebApplication implements WebApplicationInitializer {
         servlet.setLoadOnStartup(1);
     }
 
-    private WebApplicationContext getContext(){
+    private WebApplicationContext getContext() {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        ctx.register(WebApplicationConfig.class);
+        ctx.register(WebApplicationConfig.class, ORMConfig.class);
         return ctx;
     }
 }
