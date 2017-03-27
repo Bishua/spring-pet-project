@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+@Service
 public class JwtTokenCreationServiceImpl implements JwtTokenCreationService {
     public static final String TOKEN_CREATE_DATE = "token_create_date";
     public static final String TOKEN_EXPIRATION_DATE = "token_expiration_date";

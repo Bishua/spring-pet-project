@@ -14,6 +14,7 @@ import ua.bish.project.data.model.User;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link org.springframework.security.core.userdetails.UserDetailsService}
@@ -31,15 +32,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
 
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            for (Role role : user.getRoles()) {
-                grantedAuthorities.add(new SimpleGrantedAuthority(role.getRoleName()));
-            }
-        } else {
-            // default role for all users. // todo move to database
-            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found!");
         }
+
+        Set<GrantedAuthority> grantedAuthorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toSet());
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), grantedAuthorities);
     }

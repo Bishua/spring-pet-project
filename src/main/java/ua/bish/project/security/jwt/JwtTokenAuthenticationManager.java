@@ -7,13 +7,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Service;
 import ua.bish.project.security.TokenAuthentication;
 
-import java.util.Collection;
 import java.util.Date;
 
 
@@ -38,7 +35,6 @@ public class JwtTokenAuthenticationManager implements AuthenticationManager {
     }
 
     private TokenAuthentication processAuthentication(TokenAuthentication auth) throws AuthenticationException {
-
         DefaultClaims claims;
         try {
             claims = (DefaultClaims) Jwts.parser().setSigningKey(JwtTokenCreationServiceImpl.KEY)
@@ -47,19 +43,24 @@ public class JwtTokenAuthenticationManager implements AuthenticationManager {
             throw new AuthenticationServiceException("Token corrupted");
         }
 
-        if (new Date().after(new Date(claims.get(JwtTokenCreationServiceImpl.TOKEN_EXPIRATION_DATE, Long.class)))) {
-            throw new AuthenticationServiceException("Token expired date error");
+        // validate toked data
+        Long tokenExpTime = claims.get(JwtTokenCreationServiceImpl.TOKEN_EXPIRATION_DATE, Long.class);
+        String username = claims.get(JwtTokenCreationServiceImpl.USERNAME, String.class);
+        if (tokenExpTime == null || username == null) {
+            throw new AuthenticationServiceException("Invalid token");
         }
-        return buildFullTokenAuthentication(auth, claims);
+
+        if (new Date().after(new Date(tokenExpTime))) {
+            throw new AuthenticationServiceException("Token expired");
+        }
+        return buildFullTokenAuthentication(auth, username);
     }
 
-    private TokenAuthentication buildFullTokenAuthentication(TokenAuthentication authentication, DefaultClaims claims) {
-        User user = (User) userDetailsService.loadUserByUsername(claims.get("USERNAME", String.class));
-        if (user.isEnabled()) {
-            Collection<GrantedAuthority> authorities = user.getAuthorities();
-            return new TokenAuthentication(authentication.getToken(), authorities, true, user);
-        } else {
+    private TokenAuthentication buildFullTokenAuthentication(TokenAuthentication authentication, String username) {
+        User user = (User) userDetailsService.loadUserByUsername(username);
+        if (!user.isEnabled()) {
             throw new AuthenticationServiceException("User disabled");
         }
+        return new TokenAuthentication(authentication.getToken(), user.getAuthorities(), true, user);
     }
 }

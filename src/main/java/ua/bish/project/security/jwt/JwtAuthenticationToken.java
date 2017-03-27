@@ -1,4 +1,4 @@
-package ua.bish.project.security;
+package ua.bish.project.security.jwt;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;

@@ -2,8 +2,11 @@ package ua.bish.project.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ua.bish.project.data.model.User;
 import ua.bish.project.data.service.UserService;
+import ua.bish.project.security.jwt.JwtTokenCreationService;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -22,17 +26,27 @@ public class UserController {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @ResponseBody
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private JwtTokenCreationService jwtTokenCreationService;
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@RequestParam(value = "login") String login,
-                        @RequestParam(value = "password") String password) {
+    public ResponseEntity<String> login(@RequestParam(value = "login") String login,
+                                        @RequestParam(value = "password") String password) {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(login);
+        if (userDetails.getPassword().equals(bCryptPasswordEncoder.encode(password))) {
+            String token = jwtTokenCreationService.getToken(userDetails);
+            return new ResponseEntity<>(token, HttpStatus.ACCEPTED);
+        }
 
-        return "successfully logged in";
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    /**'
+    /**
+     * '
      * register new user
      */
     @ResponseBody
