@@ -9,13 +9,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "ua.bish.project.controllers")
+@ComponentScan(basePackages = "ua.bish.project")
 public class WebApplicationConfig extends WebMvcConfigurerAdapter {
+    /**
+     * static resources path settings
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**").addResourceLocations("/resources/");
     }
 
+    /**
+     * redirect settings
+     */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("redirect:/index.html");

@@ -6,6 +6,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import ua.bish.project.config.ORMConfig;
+import ua.bish.project.config.SecurityConfig;
 import ua.bish.project.config.WebApplicationConfig;
 
 import javax.servlet.ServletContext;
@@ -28,7 +29,7 @@ public class WebApplication implements WebApplicationInitializer {
 
     private WebApplicationContext getContext() {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        ctx.register(WebApplicationConfig.class, ORMConfig.class);
+        ctx.register(WebApplicationConfig.class, ORMConfig.class, SecurityConfig.class);
         return ctx;
     }
 }

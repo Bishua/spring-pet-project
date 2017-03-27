@@ -1,9 +1,10 @@
-package ua.bish.project.security;
+package ua.bish.project.security.jwt;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ua.bish.project.security.JwtAuthenticationToken;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
