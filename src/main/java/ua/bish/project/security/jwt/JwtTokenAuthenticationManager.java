@@ -9,11 +9,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
 import ua.bish.project.security.TokenAuthentication;
 
 import java.util.Date;
 
-
+@Service
 public class JwtTokenAuthenticationManager implements AuthenticationManager {
     @Autowired
     private UserDetailsService userDetailsService;

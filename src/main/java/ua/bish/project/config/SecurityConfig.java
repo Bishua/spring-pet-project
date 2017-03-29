@@ -3,9 +3,7 @@ package ua.bish.project.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -13,13 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ua.bish.project.data.dao.RoleRepository;
 import ua.bish.project.security.jwt.JwtAuthenticationFilter;
-import ua.bish.project.security.jwt.JwtTokenAuthenticationManager;
 
 @Configuration
-@EnableSpringDataWebSupport
-@EnableWebSecurity
+@EnableWebSecurity()
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
+    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
@@ -27,15 +23,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.headers().frameOptions().sameOrigin()
+        // todo find out all details
+        http
+                .headers().frameOptions().sameOrigin()
                 .and()
-                .addFilterAfter(restTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/rest/*").authenticated();
+                .antMatchers("/rest/**/").authenticated();
     }
 
     @Bean
-    public JwtAuthenticationFilter restTokenAuthenticationFilter() {
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
         JwtAuthenticationFilter restTokenAuthenticationFilter = new JwtAuthenticationFilter();
         restTokenAuthenticationFilter.setAuthenticationManager(authenticationManager);
         return restTokenAuthenticationFilter;
@@ -46,8 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    @Override
     public AuthenticationManager authenticationManager() {
-        return new JwtTokenAuthenticationManager();
+        return authenticationManager;
     }
 }

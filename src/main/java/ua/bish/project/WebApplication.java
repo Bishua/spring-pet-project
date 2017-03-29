@@ -29,7 +29,7 @@ public class WebApplication implements WebApplicationInitializer {
 
     private WebApplicationContext getContext() {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        ctx.register(WebApplicationConfig.class, ORMConfig.class, SecurityConfig.class);
+        ctx.register(SecurityConfig.class, WebApplicationConfig.class, ORMConfig.class);
         return ctx;
     }
 }

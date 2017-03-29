@@ -19,7 +19,6 @@ import ua.bish.project.security.jwt.JwtTokenCreationService;
 @Controller
 @RequestMapping(value = "/user")
 public class UserController {
-
     @Autowired
     private UserService userService;
 
@@ -37,7 +36,7 @@ public class UserController {
                                         @RequestParam(value = "password") String password) {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(login);
-        if (userDetails.getPassword().equals(bCryptPasswordEncoder.encode(password))) {
+        if (userDetails != null && bCryptPasswordEncoder.matches(password, userDetails.getPassword())) {
             String token = jwtTokenCreationService.getToken(userDetails);
             return new ResponseEntity<>(token, HttpStatus.ACCEPTED);
         }
@@ -46,7 +45,6 @@ public class UserController {
     }
 
     /**
-     * '
      * register new user
      */
     @ResponseBody

@@ -17,7 +17,7 @@ import java.io.IOException;
  * token can be received from header or as request parameter
  */
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-    public static final String FILTER_PATH = "/rest/**";
+    public static final String FILTER_PATH = "/rest/*";
 
     public JwtAuthenticationFilter() {
         super(FILTER_PATH);
