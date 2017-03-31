@@ -25,7 +25,6 @@ public class JwtTokenAuthenticationManager implements AuthenticationManager {
             if (authentication instanceof TokenAuthentication) {
                 return processAuthentication((TokenAuthentication) authentication);
             }
-            authentication.setAuthenticated(false);
             return authentication;
 
         } catch (Exception ex) {

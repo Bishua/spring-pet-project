@@ -1,5 +1,6 @@
 package ua.bish.project.security.jwt;
 
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +18,7 @@ import java.io.IOException;
  * token can be received from header or as request parameter
  */
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-    public static final String FILTER_PATH = "/rest/*";
+    public static final String FILTER_PATH = "/rest/**";
 
     public JwtAuthenticationFilter() {
         super(FILTER_PATH);
@@ -30,9 +31,8 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
             request.getRequestDispatcher(request.getServletPath() + request.getPathInfo()).forward(request, response);
         });
 
-        // authentication failed
-        setAuthenticationFailureHandler((request, response, authenticationException) ->
-                response.getOutputStream().print(authenticationException.getMessage()));
+        setAuthenticationFailureHandler((request, response, exception) -> response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                "Authentication Failed: " + exception.getMessage()));
     }
 
     @Override
@@ -40,12 +40,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
             throws AuthenticationException, IOException, ServletException {
 
         String token = request.getHeader("token");
-        if (token == null)
-            token = request.getParameter("token");
         if (token == null) {
-            TokenAuthentication authentication = new TokenAuthentication(null);
-            authentication.setAuthenticated(false);
-            return authentication;
+            token = request.getParameter("token");
+            if (token == null) {
+                // authentication without token it is not possible
+                throw new AuthenticationServiceException("no token found");
+            }
         }
         return getAuthenticationManager().authenticate(new TokenAuthentication(token));
     }

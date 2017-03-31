@@ -27,9 +27,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .headers().frameOptions().sameOrigin()
                 .and()
+                .csrf().disable()
                 .addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/rest/**/").authenticated();
+                .antMatchers("/abs/**").authenticated();
     }
 
     @Bean
